@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="cloud_invoice" translate="label" type="text" sortOrder="301" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Cloud Invoice</label>
+            <tab>sales</tab>
+            <resource>Hypernova_CloudInvoice::configuration</resource>
+            <group id="google_drive" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Google Drive</label>
+                <field id="enable_google_drive" translate="label" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Google Drive</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="google_service_credentials" translate="label" type="Magento\Config\Block\System\Config\Form\Field\File" sortOrder="6" showInDefault="1" showInWebsite="1" >
+                    <label>Google API Service Account Keys</label>
+                    <backend_model>Hypernova\CloudInvoice\Model\Config\Backend\CloudInvoiceConfigFile</backend_model>
+                    <upload_dir scope_info="1">api_keys</upload_dir>
+                </field>
+                <field id="google_share_with_accounts" type="text" translate="label" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Google Accounts to Share Invoices With (separated by comma)</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
