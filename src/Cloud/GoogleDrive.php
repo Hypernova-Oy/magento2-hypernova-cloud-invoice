@@ -75,7 +75,7 @@ class GoogleDrive implements CloudInterface
             }
 
             $file = new \Google_Service_Drive_DriveFile();
-            $file->setName('invoice-' . $invoice->getCreatedAt() . '.pdf');
+            $file->setName('invoice-' . $invoice->getIncrementId() . '.pdf');
             $file->setParents(array($folder));
             $file->setMimeType('application/pdf');
             $this->drive->files->create(
