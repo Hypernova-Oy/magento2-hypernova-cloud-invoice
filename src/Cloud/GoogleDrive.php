@@ -34,49 +34,21 @@ class GoogleDrive implements CloudInterface
         $this->drive = new Google_Service_Drive($this->client);
     }
 
+    /**
+     * Uploads invoice into Google Drive
+     *
+     * @return GoogleDrive object
+     */
     public function uploadInvoice($invoice)
     {
         try {
             $pdfContent = $this->_pdfInvoiceModel->getPdf([$invoice])->render();
 
-            $google_accounts = explode(',', $this->accounts);
-
-            // Check existence of CloudInvoices folder
-            $folder = $this->drive->files->listFiles(array(
-                'q' => 'name="CloudInvoices" and mimeType="application/vnd.google-apps.folder"',
-                'fields' => 'nextPageToken, files(id, name, mimeType, parents)'
-            ))->getFiles();
-
-            if (count($folder) == 0) {
-                // Create CloudInvoices folder
-                $file = new \Google_Service_Drive_DriveFile();
-                $file->setName('CloudInvoices');
-                $file->setMimeType('application/vnd.google-apps.folder');
-                $folder = $this->drive->files->create($file, array(
-                    'fields' => 'id'
-                ))->getId();
-            } else {
-                foreach ($folder as $f) {
-                    $folder = $f->getId(); break;
-                }
-            }
-
-            // Add administrator permissions to CloudInvoices folder
-            foreach ($google_accounts as $account) {
-                $permission = new \Google_Service_Drive_Permission();
-                $permission->setRole('writer');
-                $permission->setEmailAddress($account);
-                $permission->setType('user');
-                try {
-                    $this->drive->permissions->create($folder, $permission);
-                } catch (Exception $e) {
-                    // todo
-                }
-            }
+            $directory_id = $this->_createDirectoryStructure($invoice);
 
             $file = new \Google_Service_Drive_DriveFile();
             $file->setName('invoice-' . $invoice->getIncrementId() . '.pdf');
-            $file->setParents(array($folder));
+            $file->setParents(array($directory_id));
             $file->setMimeType('application/pdf');
             $this->drive->files->create(
                 $file,
@@ -91,6 +63,73 @@ class GoogleDrive implements CloudInterface
             $invoice->save();
         }
         return $this;
+    }
+
+    /**
+     * Return directory id into which invoice shall be uploaded
+     *
+     * @return integer
+     */
+    private function _createDirectoryStructure($invoice) {
+        // Check existence of CloudInvoices folder
+        $cloudinvoice_folder = $this->drive->files->listFiles(array(
+            'q' => 'name="CloudInvoices" and mimeType="application/vnd.google-apps.folder"',
+            'fields' => 'nextPageToken, files(id, name, mimeType, parents)'
+        ))->getFiles();
+
+        if (count($cloudinvoice_folder) == 0) {
+            // Create CloudInvoices folder
+            $file = new \Google_Service_Drive_DriveFile();
+            $file->setName('CloudInvoices');
+            $file->setMimeType('application/vnd.google-apps.folder');
+            $cloudinvoice_folder = $this->drive->files->create($file, array(
+                'fields' => 'id'
+            ))->getId();
+        } else {
+            foreach ($cloudinvoice_folder as $f) {
+                $cloudinvoice_folder = $f->getId(); break;
+            }
+        }
+
+        // Check existence of annual directory
+        $year = date('Y', strtotime($invoice->getCreatedAt()));
+        $folder = $this->drive->files->listFiles(array(
+            'q' => 'name="'.$year.'" and "'.$cloudinvoice_folder.'" in parents and mimeType="application/vnd.google-apps.folder"',
+            'fields' => 'nextPageToken, files(id, name, mimeType, parents)'
+        ))->getFiles();
+
+        if (count($folder) == 0) {
+            // Create a directory for this year
+            $file = new \Google_Service_Drive_DriveFile();
+            $file->setName($year);
+            $file->setParents(array($cloudinvoice_folder));
+            $file->setMimeType('application/vnd.google-apps.folder');
+            $folder = $this->drive->files->create($file, array(
+                'fields' => 'id'
+            ))->getId();
+        } else {
+            foreach ($folder as $f) {
+                $folder = $f->getId();
+            }
+        }
+
+        // Add administrator permissions to CloudInvoices folder
+        $google_accounts = explode(',', $this->accounts);
+        foreach ($google_accounts as $account) {
+            $permission = new \Google_Service_Drive_Permission();
+            $permission->setRole('writer');
+            $permission->setEmailAddress($account);
+            $permission->setType('user');
+            try {
+                $this->drive->permissions->create($cloudinvoice_folder, $permission);
+                $this->drive->permissions->create($folder, $permission);
+            } catch (Exception $e) {
+                $invoice->addComment($e->getMessage(), false, true);
+                $invoice->save();
+            }
+        }
+
+        return $folder;
     }
 
     private function _loadSettings() {
