@@ -41,11 +41,11 @@ class SavePdfInvoice implements ObserverInterface
                     $this->scopeConfig
                 );
                 $drive->uploadInvoice($invoice);
-                $invoice->addComment('Added to Google Drive', false, true);
+                $invoice->addComment('Added to Google Drive', false, false);
             }
 
         } catch (Exception $e) {
-            $invoice->addComment($e->getMessage(), false, true);
+            $invoice->addComment($e->getMessage(), false, false);
             $invoice->save();
         }
         return $this;

@@ -59,7 +59,7 @@ class GoogleDrive implements CloudInterface
                 )
             );
         } catch (Exception $e) {
-            $invoice->addComment($e->getMessage(), false, true);
+            $invoice->addComment($e->getMessage(), false, false);
             $invoice->save();
         }
         return $this;
@@ -124,7 +124,7 @@ class GoogleDrive implements CloudInterface
                 $this->drive->permissions->create($cloudinvoice_folder, $permission);
                 $this->drive->permissions->create($folder, $permission);
             } catch (Exception $e) {
-                $invoice->addComment($e->getMessage(), false, true);
+                $invoice->addComment($e->getMessage(), false, false);
                 $invoice->save();
             }
         }
