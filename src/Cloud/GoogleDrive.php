@@ -121,8 +121,8 @@ class GoogleDrive implements CloudInterface
             $permission->setEmailAddress($account);
             $permission->setType('user');
             try {
-                $this->drive->permissions->create($cloudinvoice_folder, $permission);
-                $this->drive->permissions->create($folder, $permission);
+                $this->drive->permissions->create($cloudinvoice_folder, $permission, array('fields' => 'id', 'sendNotificationEmail' => false));
+                $this->drive->permissions->create($folder, $permission, array('fields' => 'id', 'sendNotificationEmail' => false));
             } catch (Exception $e) {
                 $invoice->addComment($e->getMessage(), false, false);
                 $invoice->save();
