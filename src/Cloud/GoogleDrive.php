@@ -5,7 +5,7 @@ namespace Hypernova\CloudInvoice\Cloud;
 use Google_Client;
 use Google_Service_Drive;
 
-class GoogleDrive implements CloudInterface
+class GoogleDrive extends AbstractCloudService
 {
     const CREDENTIALS_DIRECTORY = '/hypernova-cloudinvoice/etc/';
     private $scopeConfig;
@@ -13,17 +13,22 @@ class GoogleDrive implements CloudInterface
     private $drive;
     private $api_credentials;
     private $accounts;
+    protected $_cloudServiceFactory;
 
     private $_pdfInvoiceModel;
 
     public function __construct(
         \Magento\Framework\Filesystem\DirectoryList $dir,
         \Magento\Sales\Model\Order\Pdf\Invoice $pdfInvoiceModel,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Hypernova\CloudInvoice\Model\CloudServiceFactory $cloudServiceFactory,
+        \Hypernova\CloudInvoice\Model\InvoicesUploadedFactory $invoicesUploaded
     ) {
+        parent::__construct($cloudServiceFactory, $invoicesUploaded);
         $this->scopeConfig = $scopeConfig;
         $this->_loadSettings();
 
+        $this->_cloudServiceFactory = $cloudServiceFactory;
         $this->_pdfInvoiceModel = $pdfInvoiceModel;
 
         $this->client = new Google_Client();
@@ -39,7 +44,7 @@ class GoogleDrive implements CloudInterface
      *
      * @return GoogleDrive object
      */
-    public function uploadInvoice($invoice)
+    public function uploadInvoice(\Magento\Sales\Model\Order\Invoice $invoice)
     {
         try {
             $pdfContent = $this->_pdfInvoiceModel->getPdf([$invoice])->render();
@@ -58,6 +63,8 @@ class GoogleDrive implements CloudInterface
                     'uploadType' => 'media'
                 )
             );
+            $invoice->addComment('Added to Google Drive', false, false);
+            $this->setUploadedStatus($invoice->getIncrementId());
         } catch (Exception $e) {
             $invoice->addComment($e->getMessage(), false, false);
             $invoice->save();
