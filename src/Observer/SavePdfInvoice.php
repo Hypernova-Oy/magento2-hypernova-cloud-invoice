@@ -41,6 +41,14 @@ class SavePdfInvoice implements ObserverInterface
 
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
+        // Return if we are configured to execute via crontab
+        if ($this->scopeConfig->getValue(
+                'cloud_invoice/cron/enabled',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ) == 1) {
+            return;
+        }
+
         $invoice = $observer->getEvent()->getInvoice();
 
         try {

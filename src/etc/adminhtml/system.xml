@@ -5,6 +5,17 @@
             <label>Cloud Invoice</label>
             <tab>sales</tab>
             <resource>Hypernova_CloudInvoice::configuration</resource>
+            <group id="cron" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Cron settings</label>
+                <field id="enabled" translate="label" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Cron (if disabled, invoices will upload as soon are saved generated)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="schedule" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Cron schedule</label>
+                    <comment>Format: * * * * *</comment>
+                </field>
+            </group>
             <group id="google_drive" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Google Drive</label>
                 <field id="enable_google_drive" translate="label" type="select" showInDefault="1" showInWebsite="1" showInStore="1">

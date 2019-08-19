@@ -70,6 +70,16 @@ class Uploader
         return $this;
     }
 
+    public function uploadAllPending() {
+        $invoices = $this->_invoiceFactory->create()->getCollection();
+
+        foreach ($invoices as $invoice) {
+            $this->upload($invoice);
+        }
+
+        return $this;
+    }
+
     public function isUploaded($invoice_id, $cloud_service_id) {
         $collection = $this->_invoicesUploadedFactory->create()->getCollection()
             ->addFieldToFilter('invoice_id', $invoice_id)

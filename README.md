@@ -37,3 +37,7 @@ Also, specify Google Accounts that you want to share the invoices with.
 Create an invoice normally via your order screen. As you create the invoice,
 it will be automatically uploaded to Google Drive and shared with the
 Google Accounts you specified in the configuration step.
+
+## Crontab
+This module can run via crontab. Go to Stores -> Configuration -> Sales -> 
+Cloud Invoice -> Cron settings to activate it.
