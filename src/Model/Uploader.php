@@ -55,7 +55,7 @@ class Uploader
             if ($this->scopeConfig->getValue(
                     'cloud_invoice/google_drive/enable_google_drive',
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                ) == 1 && !$this->isUploaded($invoice->getIncrementId(), $this->googleDrive->getCloudServiceId())) {
+                ) == 1 && !$this->isUploaded($invoice->getEntityId(), $this->googleDrive->getCloudServiceId())) {
                 $this->googleDrive->uploadInvoice($invoice);
             }
 

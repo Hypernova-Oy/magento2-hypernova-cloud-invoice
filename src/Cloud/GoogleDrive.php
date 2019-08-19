@@ -64,7 +64,7 @@ class GoogleDrive extends AbstractCloudService
                 )
             );
             $invoice->addComment('Added to Google Drive', false, false);
-            $this->setUploadedStatus($invoice->getIncrementId());
+            $this->setUploadedStatus($invoice->getEntityId());
         } catch (Exception $e) {
             $invoice->addComment($e->getMessage(), false, false);
             $invoice->save();
