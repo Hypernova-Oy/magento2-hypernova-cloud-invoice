@@ -11,19 +11,27 @@ class Uploader
     private $currentLocale;
     private $invoiceLocale;
 
-    private $_cloudServiceFactory;
+    protected $_invoiceFactory;
+
+    protected $_cloudServiceFactory;
+    protected $_invoicesUploadedFactory;
 
     private $googleDrive;
 
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\TranslateInterface $localeInterface,
+        \Magento\Sales\Model\Order\InvoiceFactory $invoiceFactory,
         \Hypernova\CloudInvoice\Model\CloudServiceFactory $cloudServiceFactory,
+        \Hypernova\CloudInvoice\Model\InvoicesUploadedFactory $invoicesUploadedFactory,
         \Hypernova\CloudInvoice\Cloud\GoogleDrive $googleDrive
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->localeInterface = $localeInterface;
+        $this->_invoiceFactory = $invoiceFactory;
         $this->_cloudServiceFactory = $cloudServiceFactory;
+        $this->_invoicesUploadedFactory = $invoicesUploadedFactory;
+
         $this->googleDrive = $googleDrive;
 
         $this->currentLocale = $this->localeInterface->getLocale();
@@ -47,7 +55,7 @@ class Uploader
             if ($this->scopeConfig->getValue(
                     'cloud_invoice/google_drive/enable_google_drive',
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                ) == 1) {
+                ) == 1 && !$this->isUploaded($invoice->getIncrementId(), $this->googleDrive->getCloudServiceId())) {
                 $this->googleDrive->uploadInvoice($invoice);
             }
 
@@ -60,5 +68,13 @@ class Uploader
         $this->localeInterface->loadData();
 
         return $this;
+    }
+
+    public function isUploaded($invoice_id, $cloud_service_id) {
+        $collection = $this->_invoicesUploadedFactory->create()->getCollection()
+            ->addFieldToFilter('invoice_id', $invoice_id)
+            ->addFieldToFilter('cloud_service_id', $cloud_service_id);
+
+        return $collection->getSize()>0;
     }
 }
