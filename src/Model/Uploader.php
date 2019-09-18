@@ -3,6 +3,8 @@
 namespace Hypernova\CloudInvoice\Model;
 
 
+use Magento\Framework\Exception\LocalizedException;
+
 class Uploader
 {
 
@@ -17,6 +19,7 @@ class Uploader
     protected $_invoicesUploadedFactory;
 
     private $googleDrive;
+    private $webDav;
 
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -24,7 +27,8 @@ class Uploader
         \Magento\Sales\Model\Order\InvoiceFactory $invoiceFactory,
         \Hypernova\CloudInvoice\Model\CloudServiceFactory $cloudServiceFactory,
         \Hypernova\CloudInvoice\Model\InvoicesUploadedFactory $invoicesUploadedFactory,
-        \Hypernova\CloudInvoice\Cloud\GoogleDrive $googleDrive
+        \Hypernova\CloudInvoice\Cloud\GoogleDrive $googleDrive,
+        \Hypernova\CloudInvoice\Cloud\WebDAV $webDav
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->localeInterface = $localeInterface;
@@ -33,6 +37,7 @@ class Uploader
         $this->_invoicesUploadedFactory = $invoicesUploadedFactory;
 
         $this->googleDrive = $googleDrive;
+        $this->webDav = $webDav;
 
         $this->currentLocale = $this->localeInterface->getLocale();
         $this->invoiceLocale = $this->currentLocale;
@@ -59,9 +64,18 @@ class Uploader
                 $this->googleDrive->uploadInvoice($invoice);
             }
 
+            // WebDAV
+            if ($this->scopeConfig->getValue(
+                    'cloud_invoice/webdav/enable_webdav',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ) == 1 && !$this->isUploaded($invoice->getEntityId(), $this->webDav->getCloudServiceId())) {
+                $this->webDav->uploadInvoice($invoice);
+            }
+
         } catch (Exception $e) {
             $invoice->addComment($e->getMessage(), false, false);
             $invoice->save();
+            throw new LocalizedException($e->getMessage());
         }
 
         $this->localeInterface->setLocale($this->currentLocale);
