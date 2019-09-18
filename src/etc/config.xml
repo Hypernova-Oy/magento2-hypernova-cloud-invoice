@@ -9,6 +9,9 @@
             <google_drive>
                 <enable_google_drive>0</enable_google_drive>
             </google_drive>
+            <webdav>
+                <enable_webdav>0</enable_webdav>
+            </webdav>
         </cloud_invoice>
     </default>
 </config>
