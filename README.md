@@ -1,6 +1,10 @@
 # magento2-hypernova-cloud-invoice
 Store Magento2 invoices into your favorite cloud storage platform.
 
+Supports
+* Google Drive
+* WebDAV (Nextcloud, ownCloud)
+
 ## Requirements
 
 #### Google Drive
@@ -8,21 +12,8 @@ Store Magento2 invoices into your favorite cloud storage platform.
 * Create service account keys https://console.developers.google.com/apis/credentials
 
 ## Installation
-* Via composer
 
-Add this Git repository to composer.json
-```
-    "repositories": {
-        "magento2-hypernova-cloud-invoice": {
-            "type": "vcs",
-            "url": "https://github.com/Hypernova-Oy/magento2-hypernova-cloud-invoice"
-        }
-    }
-```
-
-Execute 
-
-```composer require hypernova/magento2-cloud-invoice:dev-master```
+```composer require hypernova/magento2-cloud-invoice```
 
 ## Configuration
 1. Go to Stores -> Configuration -> Sales -> Cloud Invoice
