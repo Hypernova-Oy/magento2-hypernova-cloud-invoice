@@ -4,7 +4,7 @@
         <cloud_invoice>
             <cron>
                 <enabled>1</enabled>
-                <schedule>* * * * *</schedule>
+                <schedule>*/10 * * * *</schedule>
             </cron>
             <google_drive>
                 <enable_google_drive>0</enable_google_drive>

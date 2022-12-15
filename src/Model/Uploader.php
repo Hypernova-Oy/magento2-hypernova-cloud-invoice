@@ -85,7 +85,9 @@ class Uploader
     }
 
     public function uploadAllPending() {
-        $invoices = $this->_invoiceFactory->create()->getCollection();
+        $uploaded_invoices = $this->_invoicesUploadedFactory->create()->getCollection();
+        $invoices = $this->_invoiceFactory->create()->getCollection()
+            ->addFieldToFilter('entity_id', array('nin' => $uploaded_invoices->getColumnValues('invoice_id')));
 
         foreach ($invoices as $invoice) {
             $this->upload($invoice);
