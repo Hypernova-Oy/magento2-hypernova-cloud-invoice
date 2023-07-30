@@ -25,16 +25,21 @@ class WebDAV extends AbstractCloudService
         parent::__construct($cloudServiceFactory, $invoicesUploaded);
         $this->logger = $logger;
         $this->scopeConfig = $scopeConfig;
-        $this->_loadSettings();
+        if ($this->scopeConfig->getValue(
+                    'cloud_invoice/google_drive/enable_webdav',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                )
+        ) {
+            $this->_loadSettings();
+            $this->client = new \Sabre\DAV\Client(array(
+                'baseUri'  => $this->base_url,
+                'userName' => $this->username,
+                'password' => $this->password
+            ));
+        }
 
         $this->_cloudServiceFactory = $cloudServiceFactory;
         $this->_pdfInvoiceModel = $pdfInvoiceModel;
-
-        $this->client = new \Sabre\DAV\Client(array(
-            'baseUri'  => $this->base_url,
-            'userName' => $this->username,
-            'password' => $this->password
-        ));
     }
 
     /**
