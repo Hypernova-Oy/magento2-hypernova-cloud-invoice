@@ -63,17 +63,26 @@ class WebDAV extends AbstractCloudService
     }
 
     private function _loadSettings() {
-        $this->base_url = trim($this->scopeConfig->getValue(
+        $this->base_url = $this->scopeConfig->getValue(
             'cloud_invoice/webdav/webdav_url',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        ));
-        // make sure path ends with /
-        $this->base_url = rtrim($this->base_url, '/') . '/';
+        );
 
-        $this->username = trim($this->scopeConfig->getValue(
+        if ($this->base_url) {
+            $this->base_url = trim($this->base_url);
+            // make sure path ends with /
+            $this->base_url = rtrim($this->base_url, '/') . '/';
+        }
+
+        $this->username = $this->scopeConfig->getValue(
             'cloud_invoice/webdav/webdav_username',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        ));
+        );
+
+        if ($this->username) {
+            $this->username = trim($this->username);
+        }
+
         $this->password = $this->scopeConfig->getValue(
             'cloud_invoice/webdav/webdav_password',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
