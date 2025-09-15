@@ -10,7 +10,7 @@ class SavePdfInvoice implements ObserverInterface
     private $pdfInvoiceModel;
     private $scopeConfig;
     private $localeInterface;
-
+    private $currentLocale;
     private $invoiceLocale;
 
     private $uploader;
