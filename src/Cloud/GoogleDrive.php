@@ -31,12 +31,17 @@ class GoogleDrive extends AbstractCloudService
         $this->_cloudServiceFactory = $cloudServiceFactory;
         $this->_pdfInvoiceModel = $pdfInvoiceModel;
 
-        $this->client = new Google_Client();
-        $this->client->setApplicationName('hypernova/magento2-cloud-invoice');
-        $this->client->setAuthConfig($dir->getPath('var') . self::CREDENTIALS_DIRECTORY . $this->api_credentials);
-        $this->client->setScopes(Google_Service_Drive::DRIVE);
+        if ($this->scopeConfig->getValue(
+            'cloud_invoice/google_drive/enabled',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        )) {
 
-        $this->drive = new Google_Service_Drive($this->client);
+            $this->client = new Google_Client();
+            $this->client->setApplicationName('hypernova/magento2-cloud-invoice');
+            $this->client->setAuthConfig($dir->getPath('var') . self::CREDENTIALS_DIRECTORY . $this->api_credentials);
+            $this->client->setScopes(Google_Service_Drive::DRIVE);
+            $this->drive = new Google_Service_Drive($this->client);
+        }
     }
 
     /**
