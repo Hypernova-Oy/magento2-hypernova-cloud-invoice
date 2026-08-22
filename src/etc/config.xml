@@ -11,6 +11,7 @@
             </google_drive>
             <webdav>
                 <enable_webdav>0</enable_webdav>
+                <webdav_password backend_model="Magento\Config\Model\Config\Backend\Encrypted"></webdav_password>
             </webdav>
         </cloud_invoice>
     </default>

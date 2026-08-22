@@ -2,9 +2,6 @@
 
 namespace Hypernova\CloudInvoice\Model;
 
-
-use Magento\Framework\Exception\LocalizedException;
-
 class Uploader
 {
 
@@ -64,6 +61,12 @@ class Uploader
                 $this->googleDrive->uploadInvoice($invoice);
             }
 
+        } catch (\Throwable $e) {
+            $invoice->addComment($e->getMessage(), false, false);
+            $invoice->save();
+        }
+
+        try {
             // WebDAV
             if ($this->scopeConfig->getValue(
                     'cloud_invoice/webdav/enable_webdav',
@@ -72,10 +75,9 @@ class Uploader
                 $this->webDav->uploadInvoice($invoice);
             }
 
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             $invoice->addComment($e->getMessage(), false, false);
             $invoice->save();
-            throw new LocalizedException($e->getMessage());
         }
 
         $this->localeInterface->setLocale($this->currentLocale);
@@ -86,8 +88,12 @@ class Uploader
 
     public function uploadAllPending() {
         $uploaded_invoices = $this->_invoicesUploadedFactory->create()->getCollection();
-        $invoices = $this->_invoiceFactory->create()->getCollection()
-            ->addFieldToFilter('entity_id', array('nin' => $uploaded_invoices->getColumnValues('invoice_id')));
+        $invoices = $this->_invoiceFactory->create()->getCollection();
+        if ($uploaded_invoices->count() > 0) {
+            $invoices = $invoices
+                ->addFieldToFilter('entity_id', array(
+                    'nin' => $uploaded_invoices->getColumnValues('invoice_id')));
+        }
 
         foreach ($invoices as $invoice) {
             $this->upload($invoice);
