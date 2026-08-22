@@ -15,8 +15,6 @@ class SavePdfInvoice implements ObserverInterface
 
     private $uploader;
 
-    private $googleDrive = 0;
-
     public function __construct(
         \Magento\Framework\Filesystem\DirectoryList $dir,
         \Magento\Sales\Model\Order\Pdf\Invoice $pdfInvoiceModel,
@@ -53,7 +51,7 @@ class SavePdfInvoice implements ObserverInterface
 
         try {
             $this->uploader->upload($invoice);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             $invoice->addComment($e->getMessage(), false, false);
             $invoice->save();
         }

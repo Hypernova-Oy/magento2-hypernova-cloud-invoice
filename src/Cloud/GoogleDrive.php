@@ -70,7 +70,7 @@ class GoogleDrive extends AbstractCloudService
             );
             $invoice->addComment('Added to Google Drive', false, false);
             $this->setUploadedStatus($invoice->getEntityId());
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             $invoice->addComment($e->getMessage(), false, false);
             $invoice->save();
         }
@@ -135,7 +135,7 @@ class GoogleDrive extends AbstractCloudService
             try {
                 $this->drive->permissions->create($cloudinvoice_folder, $permission, array('fields' => 'id', 'sendNotificationEmail' => false));
                 $this->drive->permissions->create($folder, $permission, array('fields' => 'id', 'sendNotificationEmail' => false));
-            } catch (Exception $e) {
+            } catch (\Throwable $e) {
                 $invoice->addComment($e->getMessage(), false, false);
                 $invoice->save();
             }
